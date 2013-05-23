@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define VERSION "1.0"
+#define VERSION "1.1"
 
 #define BOOT_MAGIC_SIZE 8
 #define BOOT_NAME_SIZE 16
@@ -51,12 +51,12 @@ struct loki_hdr
 int main(int argc, char **argv)
 {
 
-	int ifd, aboot_fd, recovery;
+	int ifd, aboot_fd, ofd, recovery;
 	void *orig, *aboot, *patch;
 	struct stat st;
 	struct boot_img_hdr *hdr;
 	struct loki_hdr *loki_hdr;
-	char prop[256], cmd[1024];
+	char prop[256], outfile[1024], buf[4096];
 
 	if (argc != 3) {
 		printf("[+] Usage: %s [boot|recovery] [in.lok]\n", argv[0]);
@@ -127,21 +127,29 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	close(ifd);
-	close(aboot_fd);
 
 	printf("[+] Loki validation passed, flashing image.\n");
 
-	/* This is considered trusted input, so don't bother me about command injection */
-	snprintf(cmd, sizeof(cmd),
-			 "dd if=%s of=/dev/block/platform/msm_sdcc.1/by-name/%s bs=4096",
-			 argv[2],
+	snprintf(outfile, sizeof(outfile),
+			 "/dev/block/platform/msm_sdcc.1/by-name/%s",
 			 recovery ? "recovery" : "boot");
 
-	/* This is hackish, but no need to reinvent dd */
-	system(cmd);
+	ofd = open(outfile, O_WRONLY);
+	if (ofd < 0) {
+		printf("[-] Failed to open output block device.\n");
+		return 1;
+	}
+
+	if (write(ofd, orig, st.st_size) != st.st_size) {
+		printf("[-] Failed to write to block device.\n");
+		return 1;
+	}
 
 	printf("[+] Loki flashing complete!\n");
+	
+	close(ifd);
+	close(aboot_fd);
+	close(ofd);
 
 	return 0;
 }
