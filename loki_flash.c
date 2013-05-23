@@ -13,7 +13,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/system_properties.h>
+
+#define VERSION "1.0"
 
 #define BOOT_MAGIC_SIZE 8
 #define BOOT_NAME_SIZE 16
@@ -61,6 +62,8 @@ int main(int argc, char **argv)
 		printf("[+] Usage: %s [boot|recovery] [in.lok]\n", argv[0]);
 		return 1;
 	}
+
+	printf("[+] loki_flash v%s\n", VERSION);
 
 	if (!strcmp(argv[1], "boot")) {
 		recovery = 0;

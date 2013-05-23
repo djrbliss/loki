@@ -16,6 +16,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#define VERSION "1.0"
+
 #define BOOT_MAGIC_SIZE 8
 #define BOOT_NAME_SIZE 16
 #define BOOT_ARGS_SIZE 512
@@ -131,6 +133,8 @@ int main(int argc, char **argv)
 		printf("Usage: %s [boot|recovery] [aboot.img] [in.img] [out.lok]\n", argv[0]);
 		return 1;
 	}
+
+	printf("[+] loki_patch v%s\n", VERSION);
 
 	if (!strcmp(argv[1], "boot")) {
 		recovery = 0;
