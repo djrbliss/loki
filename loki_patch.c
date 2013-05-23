@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define VERSION "1.0"
+#define VERSION "1.1"
 
 #define BOOT_MAGIC_SIZE 8
 #define BOOT_NAME_SIZE 16
@@ -228,7 +228,16 @@ int main(int argc, char **argv)
 
 	if (!memcmp(loki_hdr->magic, "LOKI", 4)) {
 		printf("[-] Input file is already a Loki image.\n");
-		return 1;
+
+		/* Copy the entire file to the output transparently */
+		if (write(ofd, orig, st.st_size) != st.st_size) {
+			printf("[-] Failed to copy Loki image.\n");
+			return 1;
+		}
+
+		printf("[+] Copied Loki image to %s.\n", argv[4]);
+
+		return 0;
 	}
 
 	/* Set the Loki header */
