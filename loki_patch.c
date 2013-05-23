@@ -242,7 +242,7 @@ int main(int argc, char **argv)
 
 	/* Set the Loki header */
 	memcpy(loki_hdr->magic, "LOKI", 4);
-	loki_hdr->recovery = 1;
+	loki_hdr->recovery = recovery;
 	strncpy(loki_hdr->build, tgt->build, sizeof(loki_hdr->build) - 1);
 
 	page_size = hdr->page_size;
