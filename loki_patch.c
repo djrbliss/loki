@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define VERSION "1.1"
+#define VERSION "1.2"
 
 #define BOOT_MAGIC_SIZE 8
 #define BOOT_NAME_SIZE 16
@@ -66,6 +66,12 @@ struct target targets[] = {
 		.build = "JDQ39.I545VRUAMDK",
 		.check_sigs = 0x88e0fe98,
 		.hdr = 0x88f372fc,
+	},
+	{
+		.vendor = "DoCoMo",
+		.build = "JDQ39.SC04EOMUAMDI",
+		.check_sigs = 0x88e0fcd8,
+		.hdr = 0x88f0b2fc,
 	},
 };
 
