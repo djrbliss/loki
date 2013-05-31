@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define VERSION "1.1"
+#define VERSION "1.2"
 
 #define BOOT_MAGIC_SIZE 8
 #define BOOT_NAME_SIZE 16
@@ -45,13 +45,15 @@ struct loki_hdr
 	unsigned char build[128];	/* Build number */
 };
 
-#define PATTERN "\xf0\xb5\x8f\xb0\x06\x46\xf0\xf7"
+#define PATTERN1 "\xf0\xb5\x8f\xb0\x06\x46\xf0\xf7"
+#define PATTERN2 "\xf0\xb5\x8f\xb0\x07\x46\xf0\xf7"
+#define PATTERN3 "\x2d\xe9\xf0\x41\x86\xb0\xf1\xf7"
 #define ABOOT_BASE 0x88dfffd8
 
 int main(int argc, char **argv)
 {
 
-	int ifd, aboot_fd, ofd, recovery;
+	int ifd, aboot_fd, ofd, recovery, offs, match;
 	void *orig, *aboot, *patch;
 	struct stat st;
 	struct boot_img_hdr *hdr;
@@ -121,12 +123,25 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	patch = hdr->ramdisk_addr - ABOOT_BASE + aboot + 8;
-	if (memcmp(patch, PATTERN, 8)) {
+	match = 0;
+
+	for (offs = 0; offs < 0x10; offs += 0x4) {
+
+		patch = hdr->ramdisk_addr - ABOOT_BASE + aboot + offs;
+
+		if (!memcmp(patch, PATTERN1, 8) ||
+			!memcmp(patch, PATTERN2, 8) ||
+			!memcmp(patch, PATTERN3, 8)) {
+
+			match = 1;
+			break;
+		}
+	}
+
+	if (!match) {
 		printf("[-] Loki aboot version does not match device.\n");
 		return 1;
 	}
-
 
 	printf("[+] Loki validation passed, flashing image.\n");
 
@@ -146,7 +161,7 @@ int main(int argc, char **argv)
 	}
 
 	printf("[+] Loki flashing complete!\n");
-	
+
 	close(ifd);
 	close(aboot_fd);
 	close(ofd);

