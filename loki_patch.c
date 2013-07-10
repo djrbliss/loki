@@ -123,7 +123,7 @@ struct target targets[] = {
 	},
 	{
 		.vendor = "Verizon",
-		.device = "LG Motion",
+		.device = "LG Lucid 2",
 		.build = "VS87010B_12",
 		.check_sigs = 0x88f10adc,
 		.hdr = 0x88f702bc,
