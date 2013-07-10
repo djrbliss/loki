@@ -2,8 +2,8 @@
  * loki_patch
  *
  * A utility to patch unsigned boot and recovery images to make
- * them suitable for booting on the AT&T and Verizon Samsung
- * Galaxy S4
+ * them suitable for booting on the AT&T/Verizon Samsung
+ * Galaxy S4, Galaxy S4 Active, and various locked LG devices
  *
  * by Dan Rosenberg (@djrbliss)
  *
@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define VERSION "1.3"
+#define VERSION "1.4"
 
 #define BOOT_MAGIC_SIZE 8
 #define BOOT_NAME_SIZE 16
@@ -49,48 +49,71 @@ struct loki_hdr
 
 struct target {
 	char *vendor;
+	char *device;
 	char *build;
 	unsigned long check_sigs;
 	unsigned long hdr;
+	int lg;
 };
 
 struct target targets[] = {
 	{
 		.vendor = "AT&T",
+		.device = "Samsung Galaxy S4",
 		.build = "JDQ39.I337UCUAMDB or JDQ39.I337UCUAMDL",
 		.check_sigs = 0x88e0ff98,
 		.hdr = 0x88f3bafc,
+		.lg = 0,
 	},
 	{
 		.vendor = "Verizon",
+		.device = "Samsung Galaxy S4",
 		.build = "JDQ39.I545VRUAMDK",
 		.check_sigs = 0x88e0fe98,
 		.hdr = 0x88f372fc,
+		.lg = 0,
 	},
 	{
 		.vendor = "DoCoMo",
+		.device = "Samsung Galaxy S4",
 		.build = "JDQ39.SC04EOMUAMDI",
 		.check_sigs = 0x88e0fcd8,
 		.hdr = 0x88f0b2fc,
+		.lg = 0,
 	},
 	{
 		.vendor = "Verizon",
+		.device = "Samsung Galaxy S4 Active",
 		.build = "IMM76D.I200VRALH2",
 		.check_sigs = 0x88e0f5c0,
 		.hdr = 0x88ed32e0,
+		.lg = 0,
 	},
 	{
 		.vendor = "Verizon",
+		.device = "Samsung Galaxy S4 Active",
 		.build = "JZO54K.I200VRBMA1",
 		.check_sigs = 0x88e101ac,
 		.hdr = 0x88ed72e0,
-	}
+		.lg = 0,
+	},
+	{
+		.vendor = "AT&T",
+		.device = "LG Optimus G Pro",
+		.build = "E98010g",
+		.check_sigs = 0x88f11084,
+		.hdr = 0x88f54418,
+		.lg = 1
+	},
 };
 
 #define PATTERN1 "\xf0\xb5\x8f\xb0\x06\x46\xf0\xf7"
 #define PATTERN2 "\xf0\xb5\x8f\xb0\x07\x46\xf0\xf7"
 #define PATTERN3 "\x2d\xe9\xf0\x41\x86\xb0\xf1\xf7"
-#define ABOOT_BASE 0x88dfffd8
+#define PATTERN4 "\x2d\xe9\xf0\x4f\xad\xf5\xc6\x6d"
+
+#define ABOOT_BASE_SAMSUNG 0x88dfffd8
+#define ABOOT_BASE_LG 0x88efffd8
 
 unsigned char patch[] =
 "\xfe\xb5"
@@ -139,9 +162,9 @@ int patch_shellcode(unsigned int addr)
 int main(int argc, char **argv)
 {
 
-	int ifd, ofd, aboot_fd, pos, i, recovery, offset;
+	int ifd, ofd, aboot_fd, pos, i, recovery, offset, fake_size;
 	unsigned int orig_ramdisk_size, orig_kernel_size, page_kernel_size, page_ramdisk_size, page_size, page_mask;
-	unsigned long target;
+	unsigned long target, aboot_base;
 	void *orig, *aboot, *ptr;
 	struct target *tgt;
 	struct stat st;
@@ -202,7 +225,16 @@ int main(int argc, char **argv)
 		if (!memcmp(ptr, PATTERN1, 8) ||
 			!memcmp(ptr, PATTERN2, 8) ||
 			!memcmp(ptr, PATTERN3, 8)) {
-			target = (unsigned long)ptr - (unsigned long)aboot + ABOOT_BASE;
+
+			aboot_base = ABOOT_BASE_SAMSUNG;
+			target = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
+			break;
+		}
+
+		if (!memcmp(ptr, PATTERN4, 8)) {
+
+			aboot_base = ABOOT_BASE_LG;
+			target = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
 			break;
 		}
 	}
@@ -226,7 +258,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	printf("[+] Detected target %s build %s\n", tgt->vendor, tgt->build);
+	printf("[+] Detected target %s %s build %s\n", tgt->vendor, tgt->device, tgt->build);
 
 	if (patch_shellcode(tgt->hdr) < 0) {
 		printf("[-] Failed to patch shellcode.\n");
@@ -285,7 +317,15 @@ int main(int argc, char **argv)
 	offset = tgt->check_sigs & 0xf;
 
 	hdr->ramdisk_addr = tgt->check_sigs - offset;
-	hdr->ramdisk_size = 0;
+
+	if (tgt->lg) {
+		fake_size = page_size;
+		hdr->ramdisk_size = page_size;
+	}
+	else {
+		fake_size = 0x200;
+		hdr->ramdisk_size = 0;
+	}
 
 	/* Write the image header */
 	if (write(ofd, orig, page_size) != page_size) {
@@ -309,23 +349,23 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	/* Write 0x800 bytes of original code to the output */
-	buf = malloc(0x200);
+	/* Write fake_size bytes of original code to the output */
+	buf = malloc(fake_size);
 	if (!buf) {
 		printf("[-] Out of memory.\n");
 		return 1;
 	}
 
-	lseek(aboot_fd, tgt->check_sigs - ABOOT_BASE - offset, SEEK_SET);
-	read(aboot_fd, buf, 0x200);
+	lseek(aboot_fd, tgt->check_sigs - aboot_base - offset, SEEK_SET);
+	read(aboot_fd, buf, fake_size);
 
-	if (write(ofd, buf, 0x200) != 0x200) {
+	if (write(ofd, buf, fake_size) != fake_size) {
 		printf("[-] Failed to write original aboot code to output file.\n");
 		return 1;
 	}
 
 	pos = lseek(ofd, 0, SEEK_CUR);
-	lseek(ofd, pos - (0x200 - offset), SEEK_SET);
+	lseek(ofd, pos - (fake_size - offset), SEEK_SET);
 
 	/* Write the patch */
 	if (write(ofd, patch, sizeof(patch)) != sizeof(patch)) {

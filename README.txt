@@ -4,8 +4,9 @@ by Dan Rosenberg (@djrbliss)
 =============================
 
 Loki is a set of tools for creating and flashing custom kernels and recoveries
-on the AT&T and Verizon branded Samsung Galaxy S4. For an explanation of how
-the exploit works, please see the technical blog post at:
+on the AT&T and Verizon branded Samsung Galaxy S4, the Samsung Galaxy S4
+Active, and various locked LG devices. For an explanation of how the exploit
+works, please see the technical blog post at:
 
 http://blog.azimuthsecurity.com/2013/05/exploiting-samsung-galaxy-s4-secure-boot.html
 
