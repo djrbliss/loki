@@ -103,7 +103,31 @@ struct target targets[] = {
 		.build = "E98010g",
 		.check_sigs = 0x88f11084,
 		.hdr = 0x88f54418,
-		.lg = 1
+		.lg = 1,
+	},
+	{
+		.vendor = "MetroPCS",
+		.device = "LG Spirit",
+		.build = "MS87010a_05",
+		.check_sigs = 0x88f05bbc,
+		.hdr = 0x88f68194,
+		.lg = 1,
+	},
+	{
+		.vendor = "MetroPCS",
+		.device = "LG Motion",
+		.build = "MS77010f_01",
+		.check_sigs = 0x88f06914,
+		.hdr = 0x88f58194,
+		.lg = 1,
+	},
+	{
+		.vendor = "Verizon",
+		.device = "LG Motion",
+		.build = "VS87010B_12",
+		.check_sigs = 0x88f10adc,
+		.hdr = 0x88f702bc,
+		.lg = 1,
 	},
 };
 
@@ -111,6 +135,7 @@ struct target targets[] = {
 #define PATTERN2 "\xf0\xb5\x8f\xb0\x07\x46\xf0\xf7"
 #define PATTERN3 "\x2d\xe9\xf0\x41\x86\xb0\xf1\xf7"
 #define PATTERN4 "\x2d\xe9\xf0\x4f\xad\xf5\xc6\x6d"
+#define PATTERN5 "\xb0\xf1\xff\x3f\x12\xd0\x0b\x4b"
 
 #define ABOOT_BASE_SAMSUNG 0x88dfffd8
 #define ABOOT_BASE_LG 0x88efffd8
@@ -231,7 +256,8 @@ int main(int argc, char **argv)
 			break;
 		}
 
-		if (!memcmp(ptr, PATTERN4, 8)) {
+		if (!memcmp(ptr, PATTERN4, 8) ||
+			!memcmp(ptr, PATTERN5, 8)) {
 
 			aboot_base = ABOOT_BASE_LG;
 			target = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
