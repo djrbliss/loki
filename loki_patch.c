@@ -98,9 +98,9 @@ struct target targets[] = {
 		.lg = 0,
 	},
 	{
-		.vendor = "AT&T",
+		.vendor = "AT&T or HK",
 		.device = "LG Optimus G Pro",
-		.build = "E98010g",
+		.build = "E98010g or E98810b",
 		.check_sigs = 0x88f11084,
 		.hdr = 0x88f54418,
 		.lg = 1,
