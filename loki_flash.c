@@ -120,7 +120,7 @@ int main(int argc, char **argv)
 	}
 
 	/* Verify the to-be-patched address matches the known code pattern */
-	aboot = mmap(0, 0x10000, PROT_READ, MAP_PRIVATE, aboot_fd, 0);
+	aboot = mmap(0, 0x40000, PROT_READ, MAP_PRIVATE, aboot_fd, 0);
 	if (aboot == MAP_FAILED) {
 		printf("[-] Failed to mmap aboot.\n");
 		return 1;
@@ -134,6 +134,11 @@ int main(int argc, char **argv)
 			patch = hdr->ramdisk_addr - ABOOT_BASE_SAMSUNG + aboot + offs;
 		else
 			patch = hdr->ramdisk_addr - ABOOT_BASE_LG + aboot + offs;
+
+		if (patch < aboot || patch > aboot + 0x40000 - 8) {
+			printf("[-] Invalid .lok file.\n");
+			return 1;
+		}
 
 		if (!memcmp(patch, PATTERN1, 8) ||
 			!memcmp(patch, PATTERN2, 8) ||
