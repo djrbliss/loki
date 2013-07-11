@@ -109,7 +109,7 @@ struct target targets[] = {
 		.vendor = "MetroPCS",
 		.device = "LG Spirit",
 		.build = "MS87010a_05",
-		.check_sigs = 0x88f05bbc,
+		.check_sigs = 0x88f0e634,
 		.hdr = 0x88f68194,
 		.lg = 1,
 	},
