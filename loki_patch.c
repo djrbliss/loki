@@ -3,7 +3,7 @@
  *
  * A utility to patch unsigned boot and recovery images to make
  * them suitable for booting on the AT&T/Verizon Samsung
- * Galaxy S4, Galaxy S4 Active, and various locked LG devices
+ * Galaxy S4, Galaxy Stellar, and various locked LG devices
  *
  * by Dan Rosenberg (@djrbliss)
  *
@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define VERSION "1.4"
+#define VERSION "1.5"
 
 #define BOOT_MAGIC_SIZE 8
 #define BOOT_NAME_SIZE 16
@@ -83,7 +83,7 @@ struct target targets[] = {
 	},
 	{
 		.vendor = "Verizon",
-		.device = "Samsung Galaxy S4 Active",
+		.device = "Samsung Galaxy Stellar",
 		.build = "IMM76D.I200VRALH2",
 		.check_sigs = 0x88e0f5c0,
 		.hdr = 0x88ed32e0,
@@ -91,7 +91,7 @@ struct target targets[] = {
 	},
 	{
 		.vendor = "Verizon",
-		.device = "Samsung Galaxy S4 Active",
+		.device = "Samsung Galaxy Stellar",
 		.build = "JZO54K.I200VRBMA1",
 		.check_sigs = 0x88e101ac,
 		.hdr = 0x88ed72e0,
@@ -117,7 +117,7 @@ struct target targets[] = {
 		.vendor = "MetroPCS",
 		.device = "LG Motion",
 		.build = "MS77010f_01",
-		.check_sigs = 0x88f06914,
+		.check_sigs = 0x88f1015c,
 		.hdr = 0x88f58194,
 		.lg = 1,
 	},
@@ -135,7 +135,6 @@ struct target targets[] = {
 #define PATTERN2 "\xf0\xb5\x8f\xb0\x07\x46\xf0\xf7"
 #define PATTERN3 "\x2d\xe9\xf0\x41\x86\xb0\xf1\xf7"
 #define PATTERN4 "\x2d\xe9\xf0\x4f\xad\xf5\xc6\x6d"
-#define PATTERN5 "\xb0\xf1\xff\x3f\x12\xd0\x0b\x4b"
 
 #define ABOOT_BASE_SAMSUNG 0x88dfffd8
 #define ABOOT_BASE_LG 0x88efffd8
@@ -256,8 +255,7 @@ int main(int argc, char **argv)
 			break;
 		}
 
-		if (!memcmp(ptr, PATTERN4, 8) ||
-			!memcmp(ptr, PATTERN5, 8)) {
+		if (!memcmp(ptr, PATTERN4, 8)) {
 
 			aboot_base = ABOOT_BASE_LG;
 			target = (unsigned long)ptr - (unsigned long)aboot + aboot_base;

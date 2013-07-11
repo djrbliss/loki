@@ -4,22 +4,19 @@ by Dan Rosenberg (@djrbliss)
 =============================
 
 Loki is a set of tools for creating and flashing custom kernels and recoveries
-on the AT&T and Verizon branded Samsung Galaxy S4, the Samsung Galaxy S4
-Active, and various locked LG devices. For an explanation of how the exploit
-works, please see the technical blog post at:
+on the AT&T and Verizon branded Samsung Galaxy S4, the Samsung Galaxy Stellar,
+and various locked LG devices. For an explanation of how the exploit works,
+please see the technical blog post at:
 
 http://blog.azimuthsecurity.com/2013/05/exploiting-samsung-galaxy-s4-secure-boot.html
 
-Devices must be rooted in order to flash custom kernels and recoveries. At the
-time of this writing, the AT&T model may be rooted using Motochopper, and the
-Verizon model may be downgraded to a leaked pre-release kernel and then rooted
-using Motochopper.
+Devices must be rooted in order to flash custom kernels and recoveries.
 
 "loki_patch" is a tool primarily intended for developers to create custom
 kernels and recoveries. It's designed to take a specific aboot image and an
 unmodified boot or recovery image, and it generates an output image in a new
 file format, ".lok". The resulting .lok image is specifically tailored for the
-Samsung build it was created with, and can be flashed directly to the recovery
+device build it was created with, and can be flashed directly to the recovery
 or boot partition on the target device.
 
 "loki_flash" is a sample utility that can be used to flash a .lok image to an

@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define VERSION "1.4"
+#define VERSION "1.5"
 
 #define BOOT_MAGIC_SIZE 8
 #define BOOT_NAME_SIZE 16
