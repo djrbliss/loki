@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define VERSION "1.5"
+#define VERSION "1.6"
 
 #define BOOT_MAGIC_SIZE 8
 #define BOOT_NAME_SIZE 16
@@ -102,6 +102,14 @@ struct target targets[] = {
 		.device = "LG Optimus G Pro",
 		.build = "E98010g or E98810b",
 		.check_sigs = 0x88f11084,
+		.hdr = 0x88f54418,
+		.lg = 1,
+	},
+	{
+		.vendor = "KT or LGU",
+		.device = "LG Optimus G Pro",
+		.build = "F240K10o or F240L10v",
+		.check_sigs = 0x88f110b8,
 		.hdr = 0x88f54418,
 		.lg = 1,
 	},
