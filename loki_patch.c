@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define VERSION "1.6"
+#define VERSION "1.7"
 
 #define BOOT_MAGIC_SIZE 8
 #define BOOT_NAME_SIZE 16
@@ -137,15 +137,25 @@ struct target targets[] = {
 		.hdr = 0x88f702bc,
 		.lg = 1,
 	},
+	{
+		.vendor = "Boost Mobile",
+		.device = "Kyocera Hydro",
+		.build = "C5170",
+		.check_sigs = 0x7e70,
+		.hdr = 0x383fc,
+		.lg = 1,
+	},
 };
 
 #define PATTERN1 "\xf0\xb5\x8f\xb0\x06\x46\xf0\xf7"
 #define PATTERN2 "\xf0\xb5\x8f\xb0\x07\x46\xf0\xf7"
 #define PATTERN3 "\x2d\xe9\xf0\x41\x86\xb0\xf1\xf7"
 #define PATTERN4 "\x2d\xe9\xf0\x4f\xad\xf5\xc6\x6d"
+#define PATTERN5 "\x2d\xe9\xf0\x4f\x82\x46\x8d\xb0"
 
 #define ABOOT_BASE_SAMSUNG 0x88dfffd8
 #define ABOOT_BASE_LG 0x88efffd8
+#define ABOOT_BASE_KYOCERA -0x28
 
 unsigned char patch[] =
 "\xfe\xb5"
@@ -266,6 +276,13 @@ int main(int argc, char **argv)
 		if (!memcmp(ptr, PATTERN4, 8)) {
 
 			aboot_base = ABOOT_BASE_LG;
+			target = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
+			break;
+		}
+
+		if (!memcmp(ptr, PATTERN5, 8)) {
+
+			aboot_base = ABOOT_BASE_KYOCERA;
 			target = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
 			break;
 		}
