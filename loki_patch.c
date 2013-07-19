@@ -280,7 +280,7 @@ int main(int argc, char **argv)
 			break;
 		}
 
-		if (!memcmp(ptr, PATTERN5, 8)) {
+		if (!memcmp(ptr, PATTERN5, 8) && (*(unsigned long *)(aboot+12) == 0)) {
 
 			aboot_base = ABOOT_BASE_KYOCERA;
 			target = (unsigned long)ptr - (unsigned long)aboot + aboot_base;

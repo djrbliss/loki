@@ -147,7 +147,8 @@ int main(int argc, char **argv)
 		if (!memcmp(patch, PATTERN1, 8) ||
 			!memcmp(patch, PATTERN2, 8) ||
 			!memcmp(patch, PATTERN3, 8) ||
-			!memcmp(patch, PATTERN4, 8)) {
+			!memcmp(patch, PATTERN4, 8) ||
+			!memcmp(patch, PATTERN5, 8)) {
 
 			match = 1;
 			break;
