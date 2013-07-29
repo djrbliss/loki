@@ -122,6 +122,14 @@ struct target targets[] = {
 		.lg = 1,
 	},
 	{
+		.vendor = "Sprint",
+		.device = "LG Viper 4G LTE",
+		.build = "LS840ZVK",
+		.check_sigs = 0x88f1015c,
+		.hdr = 0x88f58194,
+		.lg = 1,
+	},
+	{
 		.vendor = "MetroPCS",
 		.device = "LG Motion",
 		.build = "MS77010f_01",
