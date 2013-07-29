@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define VERSION "1.7"
+#define VERSION "1.8"
 
 #define BOOT_MAGIC_SIZE 8
 #define BOOT_NAME_SIZE 16
@@ -280,7 +280,7 @@ int main(int argc, char **argv)
 			break;
 		}
 
-		if (!memcmp(ptr, PATTERN5, 8) && (*(unsigned long *)(aboot+12) == 0)) {
+		if (!memcmp(ptr, PATTERN5, 8) && (*(unsigned int *)(aboot+12) == 0)) {
 
 			aboot_base = ABOOT_BASE_KYOCERA;
 			target = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
