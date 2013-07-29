@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define VERSION "1.7"
+#define VERSION "1.7.1"
 
 #define BOOT_MAGIC_SIZE 8
 #define BOOT_NAME_SIZE 16
@@ -119,6 +119,14 @@ struct target targets[] = {
 		.build = "MS87010a_05",
 		.check_sigs = 0x88f0e634,
 		.hdr = 0x88f68194,
+		.lg = 1,
+	},
+	{
+		.vendor = "Sprint",
+		.device = "LG Viper 4G LTE",
+		.build = "LS840ZVK",
+		.check_sigs = 0x88f1015c,
+		.hdr = 0x88f58194,
 		.lg = 1,
 	},
 	{
