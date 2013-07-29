@@ -139,6 +139,14 @@ struct target targets[] = {
 	},
 	{
 		.vendor = "Boost Mobile",
+		.device = "LG Optimus F7",
+		.build = "LG870ZV4_06",
+		.check_sigs = 0x88f11714,
+		.hdr = 0x88f842ac,
+		.lg = 1,
+	},
+	{
+		.vendor = "Boost Mobile",
 		.device = "Kyocera Hydro",
 		.build = "C5170",
 		.check_sigs = 0x7e70,
