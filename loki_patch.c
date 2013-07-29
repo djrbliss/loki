@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define VERSION "2.0"
+#define VERSION "fackyouandfackyomama"
 
 #define BOOT_MAGIC_SIZE 8
 #define BOOT_NAME_SIZE 16
