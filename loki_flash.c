@@ -49,11 +49,9 @@ struct loki_hdr
 #define PATTERN2 "\xf0\xb5\x8f\xb0\x07\x46\xf0\xf7"
 #define PATTERN3 "\x2d\xe9\xf0\x41\x86\xb0\xf1\xf7"
 #define PATTERN4 "\x2d\xe9\xf0\x4f\xad\xf5\xc6\x6d"
-#define PATTERN5 "\x2d\xe9\xf0\x4f\x82\x46\x8d\xb0"
 
 #define ABOOT_BASE_SAMSUNG 0x88dfffd8
 #define ABOOT_BASE_LG 0x88efffd8
-#define ABOOT_BASE_KYOCERA -0x28
 
 int main(int argc, char **argv)
 {
@@ -132,9 +130,7 @@ int main(int argc, char **argv)
 
 	for (offs = 0; offs < 0x10; offs += 0x4) {
 
-		if (hdr->ramdisk_addr < 0x100000)
-			patch = hdr->ramdisk_addr - ABOOT_BASE_KYOCERA + aboot + offs;
-		else if (hdr->ramdisk_addr < ABOOT_BASE_LG)
+		if (hdr->ramdisk_addr < ABOOT_BASE_LG)
 			patch = hdr->ramdisk_addr - ABOOT_BASE_SAMSUNG + aboot + offs;
 		else
 			patch = hdr->ramdisk_addr - ABOOT_BASE_LG + aboot + offs;
@@ -147,8 +143,7 @@ int main(int argc, char **argv)
 		if (!memcmp(patch, PATTERN1, 8) ||
 			!memcmp(patch, PATTERN2, 8) ||
 			!memcmp(patch, PATTERN3, 8) ||
-			!memcmp(patch, PATTERN4, 8) ||
-			!memcmp(patch, PATTERN5, 8)) {
+			!memcmp(patch, PATTERN4, 8)) {
 
 			match = 1;
 			break;
