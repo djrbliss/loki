@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define VERSION "1.8"
+#define VERSION "1.9"
 
 #define BOOT_MAGIC_SIZE 8
 #define BOOT_NAME_SIZE 16
@@ -119,6 +119,14 @@ struct target targets[] = {
 		.build = "F240K10o, F240L10v, or F240S10w",
 		.check_sigs = 0x88f110b8,
 		.hdr = 0x88f54418,
+		.lg = 1,
+	},
+	{
+		.vendor = "KT",
+		.device = "LG Optimus LTE 2",
+		.build = "F160K20G",
+		.check_sigs = 0x88f10864,
+		.hdr = 0x88f802b8,
 		.lg = 1,
 	},
 	{
