@@ -170,11 +170,11 @@ struct target targets[] = {
 		.lg = 1,
 	},
 	{
-		.vendor = "Boost Mobile",
-		.device = "Kyocera Hydro",
-		.build = "C5170",
-		.check_sigs = 0x7e70,
-		.hdr = 0x383fc,
+		.vendor = "Virgin Mobile",
+		.device = "LG Optimus F3",
+		.build = "LS720ZV5",
+		.check_sigs = 0x88f108f0,
+		.hdr = 0x88f854f4,
 		.lg = 1,
 	},
 };
