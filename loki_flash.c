@@ -134,7 +134,7 @@ int main(int argc, char **argv)
 
 	for (offs = 0; offs < 0x10; offs += 0x4) {
 
-		if (hdr->ramdisk_addr < ABOOT_BASE_G2)
+		if (hdr->ramdisk_addr < ABOOT_BASE_SAMSUNG)
 			patch = hdr->ramdisk_addr - ABOOT_BASE_G2 + aboot + offs;
 		else if (hdr->ramdisk_addr < ABOOT_BASE_LG)
 			patch = hdr->ramdisk_addr - ABOOT_BASE_SAMSUNG + aboot + offs;
