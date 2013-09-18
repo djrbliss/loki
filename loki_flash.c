@@ -14,14 +14,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define VERSION "1.7"
+#define VERSION "2.0"
 
 #define BOOT_MAGIC_SIZE 8
 #define BOOT_NAME_SIZE 16
 #define BOOT_ARGS_SIZE 512
 
-struct boot_img_hdr
-{
+struct boot_img_hdr {
 	unsigned char magic[BOOT_MAGIC_SIZE];
 	unsigned kernel_size;	/* size in bytes */
 	unsigned kernel_addr;	/* physical load addr */
@@ -38,20 +37,25 @@ struct boot_img_hdr
 	unsigned id[8];			/* timestamp / checksum / sha1 / etc */
 };
 
-struct loki_hdr
-{
-	unsigned char magic[4];		/* 0x494b4f4c */
-	unsigned int recovery;		/* 0 = boot.img, 1 = recovery.img */
-	unsigned char build[128];	/* Build number */
+struct loki_hdr {
+    unsigned char magic[4];     /* 0x494b4f4c */
+    unsigned int recovery;      /* 0 = boot.img, 1 = recovery.img */
+    unsigned char build[128];   /* Build number */
+
+    unsigned int orig_kernel_size;
+    unsigned int orig_ramdisk_size;
+    unsigned int ramdisk_addr;
 };
 
 #define PATTERN1 "\xf0\xb5\x8f\xb0\x06\x46\xf0\xf7"
 #define PATTERN2 "\xf0\xb5\x8f\xb0\x07\x46\xf0\xf7"
 #define PATTERN3 "\x2d\xe9\xf0\x41\x86\xb0\xf1\xf7"
 #define PATTERN4 "\x2d\xe9\xf0\x4f\xad\xf5\xc6\x6d"
+#define PATTERN5 "\x2d\xe9\xf0\x4f\xad\xf5\x21\x7d"
 
 #define ABOOT_BASE_SAMSUNG 0x88dfffd8
 #define ABOOT_BASE_LG 0x88efffd8
+#define ABOOT_BASE_G2 0xf7fffd8
 
 int main(int argc, char **argv)
 {
@@ -130,7 +134,9 @@ int main(int argc, char **argv)
 
 	for (offs = 0; offs < 0x10; offs += 0x4) {
 
-		if (hdr->ramdisk_addr < ABOOT_BASE_LG)
+		if (hdr->ramdisk_addr < ABOOT_BASE_G2)
+			patch = hdr->ramdisk_addr - ABOOT_BASE_G2 + aboot + offs;
+		else if (hdr->ramdisk_addr < ABOOT_BASE_LG)
 			patch = hdr->ramdisk_addr - ABOOT_BASE_SAMSUNG + aboot + offs;
 		else
 			patch = hdr->ramdisk_addr - ABOOT_BASE_LG + aboot + offs;
@@ -143,7 +149,8 @@ int main(int argc, char **argv)
 		if (!memcmp(patch, PATTERN1, 8) ||
 			!memcmp(patch, PATTERN2, 8) ||
 			!memcmp(patch, PATTERN3, 8) ||
-			!memcmp(patch, PATTERN4, 8)) {
+			!memcmp(patch, PATTERN4, 8) ||
+			!memcmp(patch, PATTERN5, 8)) {
 
 			match = 1;
 			break;
