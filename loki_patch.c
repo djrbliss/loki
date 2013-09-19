@@ -195,6 +195,14 @@ struct target targets[] = {
 		.hdr = 0xf906440,
 		.lg = 1,
 	},
+	{
+		.vendor = "KT, LGU, or SKT",
+		.device = "LG G2",
+		.build = "F320K, F320L, F320S",
+		.check_sigs = 0xf81346c,
+		.hdr = 0xf8de440,
+		.lg = 1,
+	},
 };
 
 #define PATTERN1 "\xf0\xb5\x8f\xb0\x06\x46\xf0\xf7"
@@ -414,7 +422,7 @@ int main(int argc, char **argv)
 	orig_kernel_size = hdr->kernel_size;
 	orig_ramdisk_size = hdr->ramdisk_size;
 
-	printf("[+] Original kernel address:%.08x\n", hdr->kernel_addr);
+	printf("[+] Original kernel address: %.08x\n", hdr->kernel_addr);
 	printf("[+] Original ramdisk address: %.08x\n", hdr->ramdisk_addr);
 
 	/* Store the original values in unused fields of the header */
