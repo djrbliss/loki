@@ -180,6 +180,14 @@ struct target targets[] = {
 		.lg = 1,
 	},
 	{
+		.vendor = "T-Mobile",
+		.device = "LG Optimus F3",
+		.build = "LS720ZV5",
+		.check_sigs = 0x88f10264,
+		.hdr = 0x88f64508,
+		.lg = 1,
+	},
+	{
 		.vendor = "AT&T",
 		.device = "LG G2",
 		.build = "D80010d",
@@ -218,6 +226,7 @@ struct target targets[] = {
 #define PATTERN3 "\x2d\xe9\xf0\x41\x86\xb0\xf1\xf7"
 #define PATTERN4 "\x2d\xe9\xf0\x4f\xad\xf5\xc6\x6d"
 #define PATTERN5 "\x2d\xe9\xf0\x4f\xad\xf5\x21\x7d"
+#define PATTERN6 "\x2d\xe9\xf0\x4f\xf3\xb0\x05\x46"
 
 #define ABOOT_BASE_SAMSUNG 0x88dfffd8
 #define ABOOT_BASE_LG 0x88efffd8
@@ -354,7 +363,8 @@ int main(int argc, char **argv)
 			break;
 		}
 
-		if (!memcmp(ptr, PATTERN4, 8)) {
+		if (!memcmp(ptr, PATTERN4, 8) ||
+			!memcmp(ptr, PATTERN6, 8)) {
 
 			aboot_base = ABOOT_BASE_LG;
 			target = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
