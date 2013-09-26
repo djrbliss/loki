@@ -371,8 +371,7 @@ int main(int argc, char **argv)
 			break;
 		}
 
-		if (!memcmp(ptr, PATTERN4, 8) ||
-			!memcmp(ptr, PATTERN6, 8)) {
+		if (!memcmp(ptr, PATTERN4, 8)) {
 
 			aboot_base = ABOOT_BASE_LG;
 			target = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
@@ -384,6 +383,21 @@ int main(int argc, char **argv)
 			aboot_base = ABOOT_BASE_G2;
 			target = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
 			break;
+		}
+	}
+
+	/* Do a second pass for the second LG pattern. This is necessary because
+	 * apparently some LG models have both LG patterns, which throws off the
+	 * fingerprinting. */
+
+	if (!target) {
+		for (ptr = aboot; ptr < aboot + st.st_size - 0x1000; ptr++) {
+			if (!memcmp(ptr, PATTERN6, 8)) {
+
+				aboot_base = ABOOT_BASE_LG;
+				target = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
+				break;
+			}
 		}
 	}
 
