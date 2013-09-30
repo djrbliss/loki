@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define VERSION "2.0"
+#define VERSION "2.1"
 
 #define BOOT_MAGIC_SIZE 8
 #define BOOT_NAME_SIZE 16
@@ -204,11 +204,19 @@ struct target targets[] = {
 		.lg = 1,
 	},
 	{
-		.vendor = "T-Mobile or International",
+		.vendor = "T-Mobile or Canada",
 		.device = "LG G2",
 		.build = "D80110c or D803",
 		.check_sigs = 0xf813294,
 		.hdr = 0xf906440,
+		.lg = 1,
+	},
+	{
+		.vendor = "International",
+		.device = "LG G2",
+		.build = "D802b",
+		.check_sigs = 0xf813a70,
+		.hdr = 0xf9041c0,
 		.lg = 1,
 	},
 	{
@@ -220,11 +228,19 @@ struct target targets[] = {
 		.lg = 1,
 	},
 	{
-		.vendor = "KT, LGU, or SKT",
+		.vendor = "KT or LGU",
 		.device = "LG G2",
-		.build = "F320K, F320L, F320S",
+		.build = "F320K, F320L",
 		.check_sigs = 0xf81346c,
 		.hdr = 0xf8de440,
+		.lg = 1,
+	},
+	{
+		.vendor = "SKT",
+		.device = "LG G2",
+		.build = "F320S",
+		.check_sigs = 0xf8132e4,
+		.hdr = 0xf8ee440,
 		.lg = 1,
 	},
 };
