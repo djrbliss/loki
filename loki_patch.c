@@ -243,6 +243,14 @@ struct target targets[] = {
 		.hdr = 0xf8ee440,
 		.lg = 1,
 	},
+	{
+		.vendor = "International",
+		.device = "LG Optimus F5",
+		.build = "P87510e",
+		.check_sigs = 0x88f10a9c,
+		.hdr = 0x88f702b8,
+		.lg = 1,
+	},
 };
 
 #define PATTERN1 "\xf0\xb5\x8f\xb0\x06\x46\xf0\xf7"
