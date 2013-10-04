@@ -180,7 +180,7 @@ struct target targets[] = {
 		.lg = 1,
 	},
 	{
-		.vendor = "T-Mobile",
+		.vendor = "T-Mobile and MetroPCS",
 		.device = "LG Optimus F3",
 		.build = "LS720ZV5",
 		.check_sigs = 0x88f10264,
