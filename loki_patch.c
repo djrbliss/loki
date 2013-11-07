@@ -259,6 +259,14 @@ struct target targets[] = {
 		.hdr = 0x88f702b8,
 		.lg = 1,
 	},
+	{
+		.vendor = "SKT",
+		.device = "LG Optimus LTE 3",
+		.build = "F260S10l",
+		.check_sigs = 0x88f11398,
+		.hdr = 0x88f8451c,
+		.lg = 1,
+	},
 };
 
 #define PATTERN1 "\xf0\xb5\x8f\xb0\x06\x46\xf0\xf7"
