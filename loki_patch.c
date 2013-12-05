@@ -291,6 +291,30 @@ struct target targets[] = {
 		.hdr = 0x88f801b8,
 		.lg = 1,
 	},
+	{
+		.vendor = "International",
+		.device = "LG G Pad 8.3",
+		.build = "V50010c",
+		.check_sigs = 0x88f108bc,
+		.hdr = 0x88f801b8,
+		.lg = 1,
+	},
+	{
+		.vendor = "International",
+		.device = "LG Optimus L9 II",
+		.build = "D60510a",
+		.check_sigs = 0x88f10d98,
+		.hdr = 0x88f84aa4,
+		.lg = 1,
+	},
+	{
+		.vendor = "MetroPCS",
+		.device = "LG Optimus F6",
+		.build = "MS50010e",
+		.check_sigs = 0x88f10260,
+		.hdr = 0x88f70508,
+		.lg = 1,
+	},
 };
 
 #define PATTERN1 "\xf0\xb5\x8f\xb0\x06\x46\xf0\xf7"
