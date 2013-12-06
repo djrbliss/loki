@@ -8,8 +8,8 @@ MODULE_PATCH := loki_patch
 
 ALL_MODULES := $(MODULE_FLASH) $(MODULE_PATCH)
 
-CC := /root/Desktop/build_cm10/ndk_toolchain_r9/bin/arm-linux-androideabi-gcc
-CC_STRIP := /root/Desktop/build_cm10/ndk_toolchain_r9/bin/arm-linux-androideabi-strip
+CC := arm-linux-androideabi-gcc
+CC_STRIP := arm-linux-androideabi-strip
 
 CFLAGS += -g -static -Wall
 #$(LDFLAGS) +=
