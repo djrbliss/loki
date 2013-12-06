@@ -1,20 +1,34 @@
-MODULES_FLASH := loki_flash.o
-MODULES_PATCH := loki_patch.o
-MODULES := $(MODULES_FLASH) $(MODULES_PATCH)
+SRC_FLASH := loki_flash.c
+OBJ_FLASH = $(SRC_FLASH:.c=.o)
+MODULE_FLASH := loki_flash
+
+SRC_PATCH := loki_patch.c
+OBJ_PATCH = $(SRC_PATCH:.c=.o)
+MODULE_PATCH := loki_patch
+
+ALL_MODULES := $(MODULE_FLASH) $(MODULE_PATCH)
 
 CC := /root/Desktop/build_cm10/ndk_toolchain_r9/bin/arm-linux-androideabi-gcc
+CC_STRIP := /root/Desktop/build_cm10/ndk_toolchain_r9/bin/arm-linux-androideabi-strip
+
 CFLAGS += -g -static -Wall
-#$(LDFLAGS) := 
+#$(LDFLAGS) +=
 
-MAKEARCH := $(CC) $(CFLAGS)
 
-all: loki_flash loki_patch
+all: $(ALL_MODULES)
 
-loki_flash: $(MODULES_FLASH)
-	$(MAKEARCH) $(MODULES_FLASH) -o loki_flash $(LDFLAGS)
+$(MODULE_FLASH): $(OBJ_FLASH)
+	$(CC) $(CFLAGS) $(OBJ_FLASH) -o $(MODULE_FLASH) $(LDFLAGS)
 
-loki_patch: $(MODULES_PATCH)
-	$(MAKEARCH) $(MODULES_PATCH) -o loki_patch $(LDFLAGS)
+$(MODULE_PATCH): $(OBJ_PATCH)
+	$(CC) $(CFLAGS) -o $(MODULE_PATCH) $(OBJ_PATCH) $(LDFLAGS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+strip:
+	$(CC_STRIP) --strip-unneeded $(ALL_MODULES)
+	$(CC_STRIP) --strip-debug $(ALL_MODULES)
 
 clean:
 	rm -f *.o
