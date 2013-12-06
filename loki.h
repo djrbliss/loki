@@ -7,6 +7,8 @@
 #define BOOT_NAME_SIZE 16
 #define BOOT_ARGS_SIZE 512
 
+#define BOOT_PARTITION      "/dev/block/platform/msm_sdcc.1/by-name/boot"
+#define RECOVERY_PARTITION  "/dev/block/platform/msm_sdcc.1/by-name/recovery"
 #define ABOOT_PARTITION     "/dev/block/platform/msm_sdcc.1/by-name/aboot"
 
 #define PATTERN1 "\xf0\xb5\x8f\xb0\x06\x46\xf0\xf7"

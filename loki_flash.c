@@ -125,8 +125,8 @@ int main(int argc, char **argv)
 	printf("[+] Loki validation passed, flashing image.\n");
 
 	snprintf(outfile, sizeof(outfile),
-			 "/dev/block/platform/msm_sdcc.1/by-name/%s",
-			 recovery ? "recovery" : "boot");
+			 "%s",
+			 recovery ? RECOVERY_PARTITION : BOOT_PARTITION);
 
 	ofd = open(outfile, O_WRONLY);
 	if (ofd < 0) {
