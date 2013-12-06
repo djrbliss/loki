@@ -53,7 +53,7 @@ struct boot_img_hdr {
 struct loki_hdr {
     unsigned char magic[4];     /* 0x494b4f4c */
     unsigned int recovery;      /* 0 = boot.img, 1 = recovery.img */
-    unsigned char build[128];   /* Build number */
+    char build[128];   /* Build number */
 
     unsigned int orig_kernel_size;
     unsigned int orig_ramdisk_size;

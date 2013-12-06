@@ -328,7 +328,8 @@ unsigned char patch[] =
 int patch_shellcode(unsigned int header, unsigned int ramdisk)
 {
 
-	int i, found_header, found_ramdisk;
+	unsigned int i;
+	int found_header, found_ramdisk;
 	unsigned int *ptr;
 
 	found_header = 0;

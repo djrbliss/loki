@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 	struct stat st;
 	struct boot_img_hdr *hdr;
 	struct loki_hdr *loki_hdr;
-	char prop[256], outfile[1024], buf[4096];
+	char outfile[1024];
 
 	if (argc != 3) {
 		printf("[+] Usage: %s [boot|recovery] [in.lok]\n", argv[0]);
