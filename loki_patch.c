@@ -292,6 +292,14 @@ struct target targets[] = {
 		.hdr = 0xf8d41c0,
 		.lg = 1,
 	},
+	{
+		.vendor = "KT",
+		.device = "LG Optimus GK",
+		.build = "F220K",
+		.check_sigs = 0x88f11034,
+		.hdr = 0x88f54418,
+		.lg = 1,
+	},
 };
 
 unsigned char patch[] =
