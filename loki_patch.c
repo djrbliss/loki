@@ -263,7 +263,7 @@ struct target targets[] = {
 	{
 		.vendor = "International",
 		.device = "LG G Pad 8.3",
-		.build = "V50010c",
+		.build = "V50010c or V50010e",
 		.check_sigs = 0x88f108bc,
 		.hdr = 0x88f801b8,
 		.lg = 1,
