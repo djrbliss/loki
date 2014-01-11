@@ -316,6 +316,14 @@ struct target targets[] = {
 		.hdr = 0x88f54418,
 		.lg = 1,
 	},
+	{
+		.vendor = "International",
+		.device = "LG Vu 3",
+		.build = "F300L",
+		.check_sigs = 0xf813170,
+		.hdr = 0xf8d2440,
+		.lg = 1,
+	},
 };
 
 unsigned char patch[] =
