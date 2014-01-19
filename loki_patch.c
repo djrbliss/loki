@@ -141,6 +141,14 @@ struct target targets[] = {
 		.lg = 1,
 	},
 	{
+		.vendor = "US Cellular",
+		.device = "LG Optimus F7",
+		.build = "US78011a",
+		.check_sigs = 0x88f112c8,
+		.hdr = 0x88f84518,
+		.lg = 1,
+	},
+	{
 		.vendor = "Virgin Mobile",
 		.device = "LG Optimus F3",
 		.build = "LS720ZV5",
@@ -298,6 +306,14 @@ struct target targets[] = {
 		.build = "MS50010e",
 		.check_sigs = 0x88f10260,
 		.hdr = 0x88f70508,
+		.lg = 1,
+	},
+	{
+		.vendor = "Open EU",
+		.device = "LG Optimus F6",
+		.build = "D50510a",
+		.check_sigs = 0x88f10284,
+		.hdr = 0x88f70aa4,
 		.lg = 1,
 	},
 	{
