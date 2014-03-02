@@ -6,7 +6,11 @@ SRC_PATCH := loki_patch.c
 OBJ_PATCH = $(SRC_PATCH:.c=.o)
 MODULE_PATCH := loki_patch
 
-ALL_MODULES := $(MODULE_FLASH) $(MODULE_PATCH)
+SRC_FIND := loki_find.c
+OBJ_FIND = $(SRC_FIND:.c=.o)
+MODULE_FIND := loki_find
+
+ALL_MODULES := $(MODULE_FLASH) $(MODULE_PATCH) $(MODULE_FIND)
 
 CC := arm-linux-androideabi-gcc
 CC_STRIP := arm-linux-androideabi-strip
@@ -22,6 +26,9 @@ $(MODULE_FLASH): $(OBJ_FLASH)
 
 $(MODULE_PATCH): $(OBJ_PATCH)
 	$(CC) $(CFLAGS) -o $(MODULE_PATCH) $(OBJ_PATCH) $(LDFLAGS)
+
+$(MODULE_FIND): $(OBJ_FIND)
+	$(CC) $(CFLAGS) -o $(MODULE_FIND) $(OBJ_FIND) $(LDFLAGS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $<
