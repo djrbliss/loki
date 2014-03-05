@@ -49,4 +49,8 @@ struct loki_hdr {
     unsigned int ramdisk_addr;
 };
 
+int loki_patch(const char* partition_label, const char* aboot_image, const char* in_image, const char* out_image);
+int loki_flash(const char* partition_label, const char* loki_image);
+int loki_find(const char* aboot_image);
+
 #endif //__LOKI_H_
