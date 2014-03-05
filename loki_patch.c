@@ -418,9 +418,8 @@ int patch_shellcode(unsigned int header, unsigned int ramdisk)
 	return -1;
 }
 
-int main(int argc, char **argv)
+int loki_patch(const char* partition_label, const char* aboot_image, const char* in_image, const char* out_image)
 {
-
 	int ifd, ofd, aboot_fd, pos, i, recovery, offset, fake_size;
 	unsigned int orig_ramdisk_size, orig_kernel_size, page_kernel_size, page_ramdisk_size, page_size, page_mask;
 	unsigned long target, aboot_base;
@@ -431,16 +430,9 @@ int main(int argc, char **argv)
 	struct loki_hdr *loki_hdr;
 	char *buf;
 
-	if (argc != 5) {
-		printf("Usage: %s [boot|recovery] [aboot.img] [in.img] [out.lok]\n", argv[0]);
-		return 1;
-	}
-
-	printf("[+] loki_patch v%s\n", VERSION);
-
-	if (!strcmp(argv[1], "boot")) {
+	if (!strcmp(partition_label, "boot")) {
 		recovery = 0;
-	} else if (!strcmp(argv[1], "recovery")) {
+	} else if (!strcmp(partition_label, "recovery")) {
 		recovery = 1;
 	} else {
 		printf("[+] First argument must be \"boot\" or \"recovery\".\n");
@@ -448,21 +440,21 @@ int main(int argc, char **argv)
 	}
 
 	/* Open input files */
-	aboot_fd = open(argv[2], O_RDONLY);
+	aboot_fd = open(aboot_image, O_RDONLY);
 	if (aboot_fd < 0) {
-		printf("[-] Failed to open %s for reading.\n", argv[2]);
+		printf("[-] Failed to open %s for reading.\n", aboot_image);
 		return 1;
 	}
 
-	ifd = open(argv[3], O_RDONLY);
+	ifd = open(in_image, O_RDONLY);
 	if (ifd < 0) {
-		printf("[-] Failed to open %s for reading.\n", argv[3]);
+		printf("[-] Failed to open %s for reading.\n", in_image);
 		return 1;
 	}
 
-	ofd = open(argv[4], O_WRONLY|O_CREAT|O_TRUNC, 0644);
+	ofd = open(out_image, O_WRONLY|O_CREAT|O_TRUNC, 0644);
 	if (ofd < 0) {
-		printf("[-] Failed to open %s for writing.\n", argv[4]);
+		printf("[-] Failed to open %s for writing.\n", out_image);
 		return 1;
 	}
 
@@ -565,7 +557,7 @@ int main(int argc, char **argv)
 			return 1;
 		}
 
-		printf("[+] Copied Loki image to %s.\n", argv[4]);
+		printf("[+] Copied Loki image to %s.\n", out_image);
 
 		return 0;
 	}
@@ -674,7 +666,7 @@ int main(int argc, char **argv)
 	close(ofd);
 	close(aboot_fd);
 
-	printf("[+] Output file written to %s\n", argv[4]);
+	printf("[+] Output file written to %s\n", out_image);
 
 	return 0;
 }
