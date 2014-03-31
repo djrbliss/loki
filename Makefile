@@ -1,4 +1,4 @@
-SRC_LOKI := loki_flash.c loki_patch.c loki_find.c main.c
+SRC_LOKI := loki_flash.c loki_patch.c loki_find.c loki_unlok.c main.c
 OBJ_LOKI = $(SRC_LOKI:.c=.o)
 MODULE_LOKI := loki_tool
 

@@ -23,6 +23,10 @@ static int print_help(const char* cmd) {
     printf("\n");
     printf("> Find offset from aboot image:\n");
     printf("%s [find] [aboot.img]\n", cmd);
+    printf("\n");
+    printf("> Revert Loki patching:\n");
+    printf("%s [unlok] [in.lok] [out.img]\n", cmd);
+    printf("\n");
     return 1;
 }
 
@@ -42,6 +46,10 @@ int main(int argc, char **argv) {
     } else if (argc == 3 && strcmp(argv[1], "find") == 0) {
         // argv[2]: aboot_image
         return loki_find(argv[2]);
+    } else if (argc == 4 && strcmp(argv[1], "unlok") == 0) {
+        // argv[2]: in_image
+        // argv[3]: out_image
+        return loki_unlok(argv[2], argv[3]);
     }
 
     return print_help(argv[0]);
