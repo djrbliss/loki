@@ -12,19 +12,20 @@ http://blog.azimuthsecurity.com/2013/05/exploiting-samsung-galaxy-s4-secure-boot
 
 Devices must be rooted in order to flash custom kernels and recoveries.
 
-"loki_patch" is a tool primarily intended for developers to create custom
+loki_tool:
+[patch] option is primarily intended for developers to create custom
 kernels and recoveries. It's designed to take a specific aboot image and an
 unmodified boot or recovery image, and it generates an output image in a new
 file format, ".lok". The resulting .lok image is specifically tailored for the
 device build it was created with, and can be flashed directly to the recovery
 or boot partition on the target device.
 
-"loki_flash" is a sample utility that can be used to flash a .lok image to an
-actual device. It will verify that the provided .lok image is safe to flash for
-a given target, and then perform the flashing if validation is successful. It
-is also possible to simply use "dd" to flash a .lok image directly to the boot
-or recovery partition, but using loki_flash is recommended in order to validate
-that the .lok matches the target device.
+[flash] option can be used to flash a .lok image to an actual device.
+It will verify that the provided .lok image is safe to flash for a given target
+and then perform the flashing if validation is successful. It is also possible
+to simply use "dd" to flash a .lok image directly to the boot or recovery partition,
+but using [flash] option is recommended in order to validate that the .lok matches
+the target device.
 
 
 =============
@@ -44,27 +45,27 @@ dan@pc:~$ adb pull /data/local/tmp/aboot.img
 3293 KB/s (2097152 bytes in 0.621s)
 
 
-Next, a .lok image can be prepared using loki_patch:
+Next, a .lok image can be prepared using loki_tool [patch]:
 
 
-dan@pc:~$ loki_patch
-Usage: ./loki_patch [boot|recovery] [aboot.img] [in.img] [out.lok]
-dan@pc:~$ loki_patch recovery aboot.img cwm.img cwm.lok
+dan@pc:~$ loki_tool patch
+Usage: ./loki_tool [patch] [boot|recovery] [aboot.img] [in.img] [out.lok]
+dan@pc:~$ loki_tool patch recovery aboot.img cwm.img cwm.lok
 [+] Detected target AT&T build JDQ39.I337UCUAMDB or JDQ39.I337UCUAMDL
 [+] Output file written to cwm.lok
 
 
-Finally, the .lok image can be flashed using loki_flash:
+Finally, the .lok image can be flashed using loki_tool [flash]:
 
 
 dan@pc:~$ adb push cwm.lok /data/local/tmp
-dan@pc:~$ adb push loki_flash /data/local/tmp
+dan@pc:~$ adb push loki_tool /data/local/tmp
 dan@pc:~$ adb shell
 shell@android:/ $ su
-shell@android:/ # chmod 755 /data/local/tmp/loki_flash
-shell@android:/ # /data/local/tmp/loki_flash
-Usage: /data/local/tmp/loki_flash [boot|recovery] [in.lok]
-shell@android:/ # /data/local/tmp/loki_flash recovery /data/local/tmp/cwm.lok
+shell@android:/ # chmod 755 /data/local/tmp/loki_tool
+shell@android:/ # /data/local/tmp/loki_tool
+Usage: /data/local/tmp/loki_tool [flash] [boot|recovery] [in.lok]
+shell@android:/ # /data/local/tmp/loki_tool flash recovery /data/local/tmp/cwm.lok
 [+] Loki validation passed, flashing image.
 2253+1 records in
 2253+1 records out
