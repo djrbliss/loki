@@ -9,7 +9,7 @@ include $(BUILD_STATIC_LIBRARY)
 
 # build static binary
 include $(CLEAR_VARS)
-LOCAL_SRC_FILES := loki_flash.c loki_patch.c loki_find.c main.c
+LOCAL_SRC_FILES := loki_flash.c loki_patch.c loki_find.c loki_unlok.c main.c
 LOCAL_MODULE := loki_tool_static
 LOCAL_MODULE_STEM := loki_tool
 LOCAL_MODULE_TAGS := eng
