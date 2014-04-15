@@ -364,6 +364,14 @@ struct target targets[] = {
 		.hdr = 0xf8d2440,
 		.lg = 1,
 	},
+	{
+		.vendor = "Sprint",
+		.device = "LG Viper",
+		.build = "LS840ZVK",
+		.check_sigs = 0x4010fe18,
+		.hdr = 0x40194198,
+		.lg = 1,
+	},
 };
 
 static unsigned char patch[] = PATCH;
@@ -450,27 +458,15 @@ int loki_patch(const char* partition_label, const char* aboot_image, const char*
 	}
 
 	target = 0;
+	aboot_base = *(unsigned int *)(aboot + 12) - 0x28;
 
 	for (ptr = aboot; ptr < aboot + st.st_size - 0x1000; ptr++) {
 		if (!memcmp(ptr, PATTERN1, 8) ||
 			!memcmp(ptr, PATTERN2, 8) ||
-			!memcmp(ptr, PATTERN3, 8)) {
+			!memcmp(ptr, PATTERN3, 8) ||
+			!memcmp(ptr, PATTERN4, 8) ||
+			!memcmp(ptr, PATTERN5, 8)) {
 
-			aboot_base = ABOOT_BASE_SAMSUNG;
-			target = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
-			break;
-		}
-
-		if (!memcmp(ptr, PATTERN4, 8)) {
-
-			aboot_base = ABOOT_BASE_LG;
-			target = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
-			break;
-		}
-
-		if (!memcmp(ptr, PATTERN5, 8)) {
-
-			aboot_base = ABOOT_BASE_G2;
 			target = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
 			break;
 		}
@@ -484,7 +480,6 @@ int loki_patch(const char* partition_label, const char* aboot_image, const char*
 		for (ptr = aboot; ptr < aboot + st.st_size - 0x1000; ptr++) {
 			if (!memcmp(ptr, PATTERN6, 8)) {
 
-				aboot_base = ABOOT_BASE_LG;
 				target = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
 				break;
 			}

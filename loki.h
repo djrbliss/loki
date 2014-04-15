@@ -21,6 +21,7 @@
 #define ABOOT_BASE_SAMSUNG 0x88dfffd8
 #define ABOOT_BASE_LG 0x88efffd8
 #define ABOOT_BASE_G2 0xf7fffd8
+#define ABOOT_BASE_VIPER 0x40100000
 
 struct boot_img_hdr {
     unsigned char magic[BOOT_MAGIC_SIZE];

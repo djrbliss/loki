@@ -85,12 +85,16 @@ int loki_flash(const char* partition_label, const char* loki_image)
 
 	for (offs = 0; offs < 0x10; offs += 0x4) {
 
-		if (hdr->ramdisk_addr < ABOOT_BASE_SAMSUNG)
-			patch = hdr->ramdisk_addr - ABOOT_BASE_G2 + aboot + offs;
-		else if (hdr->ramdisk_addr < ABOOT_BASE_LG)
-			patch = hdr->ramdisk_addr - ABOOT_BASE_SAMSUNG + aboot + offs;
-		else
+		patch = NULL;
+
+		if (hdr->ramdisk_addr > ABOOT_BASE_LG)
 			patch = hdr->ramdisk_addr - ABOOT_BASE_LG + aboot + offs;
+		else if (hdr->ramdisk_addr > ABOOT_BASE_SAMSUNG)
+			patch = hdr->ramdisk_addr - ABOOT_BASE_SAMSUNG + aboot + offs;
+		else if (hdr->ramdisk_addr > ABOOT_BASE_VIPER)
+			patch = hdr->ramdisk_addr - ABOOT_BASE_VIPER + aboot + offs;
+		else if (hdr->ramdisk_addr > ABOOT_BASE_G2)
+			patch = hdr->ramdisk_addr - ABOOT_BASE_G2 + aboot + offs;
 
 		if (patch < aboot || patch > aboot + 0x40000 - 8) {
 			printf("[-] Invalid .lok file.\n");
