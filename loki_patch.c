@@ -317,6 +317,14 @@ struct target targets[] = {
 		.lg = 1,
 	},
 	{
+                .vendor = "Verizon",
+                .device = "LG G Pad 8.3",
+                .build = "VK81010c",
+                .check_sigs = 0x88f11080,
+                .hdr = 0x88fd81b8,
+                .lg = 1,
+        },
+	{
 		.vendor = "International",
 		.device = "LG Optimus L9 II",
 		.build = "D60510a",
