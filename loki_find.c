@@ -11,24 +11,16 @@
 #define BOOT_PATTERN3 "\x2d\xe9\xf0\x4f\x4f\xf4\x70\x40"	/* LG */
 #define BOOT_PATTERN4 "\x2d\xe9\xf0\x4f\xad\xf5\x80\x5d"	/* LG G2 */
 
-int main(int argc, char **argv)
+int loki_find(const char* aboot_image)
 {
-
 	int aboot_fd;
 	struct stat st;
 	void *aboot, *ptr;
 	unsigned long aboot_base, check_sigs, boot_mmc;
 
-	if (argc != 2) {
-		printf("[-] Usage: %s [aboot.img]\n", argv[0]);
-		return 1;
-	}
-
-	printf("[+] loki_find v%s\n", VERSION);
-
-	aboot_fd = open(argv[1], O_RDONLY);
+	aboot_fd = open(aboot_image, O_RDONLY);
 	if (aboot_fd < 0) {
-		printf("[-] Failed to open %s for reading.\n", argv[1]);
+		printf("[-] Failed to open %s for reading.\n", aboot_image);
 		return 1;
 	}
 
@@ -44,35 +36,22 @@ int main(int argc, char **argv)
 	}
 
 	check_sigs = 0;
+	aboot_base = *(unsigned int *)(aboot + 12) - 0x28;
 
 	/* Do a pass to find signature checking function */
 	for (ptr = aboot; ptr < aboot + st.st_size - 0x1000; ptr++) {
 		if (!memcmp(ptr, PATTERN1, 8) ||
 			!memcmp(ptr, PATTERN2, 8) ||
-			!memcmp(ptr, PATTERN3, 8)) {
+			!memcmp(ptr, PATTERN3, 8) ||
+			!memcmp(ptr, PATTERN4, 8) ||
+			!memcmp(ptr, PATTERN5, 8)) {
 
-			aboot_base = ABOOT_BASE_SAMSUNG;
-			check_sigs = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
-			break;
-		}
-
-		if (!memcmp(ptr, PATTERN4, 8)) {
-
-			aboot_base = ABOOT_BASE_LG;
-			check_sigs = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
-			break;
-		}
-
-		if (!memcmp(ptr, PATTERN5, 8)) {
-
-			aboot_base = ABOOT_BASE_G2;
 			check_sigs = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
 			break;
 		}
 
 		if (!memcmp(ptr, PATTERN6, 8)) {
 
-			aboot_base = ABOOT_BASE_LG;
 			check_sigs = (unsigned long)ptr - (unsigned long)aboot + aboot_base;
 
 			/* Don't break, because the other LG patterns override this one */

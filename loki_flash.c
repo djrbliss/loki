@@ -16,9 +16,8 @@
 #include <unistd.h>
 #include "loki.h"
 
-int main(int argc, char **argv)
+int loki_flash(const char* partition_label, const char* loki_image)
 {
-
 	int ifd, aboot_fd, ofd, recovery, offs, match;
 	void *orig, *aboot, *patch;
 	struct stat st;
@@ -26,16 +25,9 @@ int main(int argc, char **argv)
 	struct loki_hdr *loki_hdr;
 	char outfile[1024];
 
-	if (argc != 3) {
-		printf("[+] Usage: %s [boot|recovery] [in.lok]\n", argv[0]);
-		return 1;
-	}
-
-	printf("[+] loki_flash v%s\n", VERSION);
-
-	if (!strcmp(argv[1], "boot")) {
+	if (!strcmp(partition_label, "boot")) {
 		recovery = 0;
-	} else if (!strcmp(argv[1], "recovery")) {
+	} else if (!strcmp(partition_label, "recovery")) {
 		recovery = 1;
 	} else {
 		printf("[+] First argument must be \"boot\" or \"recovery\".\n");
@@ -49,9 +41,9 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	ifd = open(argv[2], O_RDONLY);
+	ifd = open(loki_image, O_RDONLY);
 	if (ifd < 0) {
-		printf("[-] Failed to open %s for reading.\n", argv[2]);
+		printf("[-] Failed to open %s for reading.\n", loki_image);
 		return 1;
 	}
 
@@ -93,12 +85,16 @@ int main(int argc, char **argv)
 
 	for (offs = 0; offs < 0x10; offs += 0x4) {
 
-		if (hdr->ramdisk_addr < ABOOT_BASE_SAMSUNG)
-			patch = hdr->ramdisk_addr - ABOOT_BASE_G2 + aboot + offs;
-		else if (hdr->ramdisk_addr < ABOOT_BASE_LG)
-			patch = hdr->ramdisk_addr - ABOOT_BASE_SAMSUNG + aboot + offs;
-		else
+		patch = NULL;
+
+		if (hdr->ramdisk_addr > ABOOT_BASE_LG)
 			patch = hdr->ramdisk_addr - ABOOT_BASE_LG + aboot + offs;
+		else if (hdr->ramdisk_addr > ABOOT_BASE_SAMSUNG)
+			patch = hdr->ramdisk_addr - ABOOT_BASE_SAMSUNG + aboot + offs;
+		else if (hdr->ramdisk_addr > ABOOT_BASE_VIPER)
+			patch = hdr->ramdisk_addr - ABOOT_BASE_VIPER + aboot + offs;
+		else if (hdr->ramdisk_addr > ABOOT_BASE_G2)
+			patch = hdr->ramdisk_addr - ABOOT_BASE_G2 + aboot + offs;
 
 		if (patch < aboot || patch > aboot + 0x40000 - 8) {
 			printf("[-] Invalid .lok file.\n");

@@ -1,12 +1,6 @@
-SRC_FLASH := loki_flash.c
-OBJ_FLASH = $(SRC_FLASH:.c=.o)
-MODULE_FLASH := loki_flash
-
-SRC_PATCH := loki_patch.c
-OBJ_PATCH = $(SRC_PATCH:.c=.o)
-MODULE_PATCH := loki_patch
-
-ALL_MODULES := $(MODULE_FLASH) $(MODULE_PATCH)
+SRC_LOKI := loki_flash.c loki_patch.c loki_find.c loki_unlok.c main.c
+OBJ_LOKI = $(SRC_LOKI:.c=.o)
+MODULE_LOKI := loki_tool
 
 CC := arm-linux-androideabi-gcc
 CC_STRIP := arm-linux-androideabi-strip
@@ -15,21 +9,16 @@ CFLAGS += -g -static -Wall
 #$(LDFLAGS) +=
 
 
-all: $(ALL_MODULES)
-
-$(MODULE_FLASH): $(OBJ_FLASH)
-	$(CC) $(CFLAGS) $(OBJ_FLASH) -o $(MODULE_FLASH) $(LDFLAGS)
-
-$(MODULE_PATCH): $(OBJ_PATCH)
-	$(CC) $(CFLAGS) -o $(MODULE_PATCH) $(OBJ_PATCH) $(LDFLAGS)
-
 %.o: %.c
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+$(MODULE_LOKI): $(OBJ_LOKI)
+	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
 strip:
-	$(CC_STRIP) --strip-unneeded $(ALL_MODULES)
-	$(CC_STRIP) --strip-debug $(ALL_MODULES)
+	$(CC_STRIP) --strip-unneeded $(MODULE_LOKI)
+	$(CC_STRIP) --strip-debug $(MODULE_LOKI)
 
 clean:
 	rm -f *.o
-	rm -f loki_flash loki_patch
+	rm -f loki_tool
