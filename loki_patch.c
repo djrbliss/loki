@@ -357,6 +357,14 @@ struct target targets[] = {
 		.lg = 1,
 	},
 	{
+		.vendor = "KDDI",
+		.device = "LG",
+		.build = "LGL21",
+		.check_sigs = 0x88f10218,
+		.hdr = 0x88f50198,
+		.lg = 1,
+	},
+	{
 		.vendor = "KT",
 		.device = "LG Optimus GK",
 		.build = "F220K",
