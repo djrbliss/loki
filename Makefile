@@ -8,6 +8,10 @@ CC_STRIP := arm-linux-androideabi-strip
 CFLAGS += -g -static -Wall
 #$(LDFLAGS) +=
 
+all: $(MODULE_LOKI)
+
+host: CC := gcc
+host: $(MODULE_LOKI)
 
 %.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -22,3 +26,5 @@ strip:
 clean:
 	rm -f *.o
 	rm -f loki_tool
+
+.phony: host all
