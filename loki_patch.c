@@ -404,6 +404,14 @@ struct target targets[] = {
 		.hdr = 0xf8c2440,
 		.lg = 1,
 	},
+	{
+		.vendor = "Sprint",
+		.device = "LG Mach",
+		.build = "LS860ZV7",
+		.check_sigs = 0x88f102b4,
+		.hdr = 0x88f6c194,
+		.lg = 1,
+	},
 };
 
 static unsigned char patch[] = PATCH;
