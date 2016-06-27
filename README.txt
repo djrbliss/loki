@@ -1,3 +1,11 @@
+
+WARNING:
+
+This project is no longer actively maintained, because the vulnerability that
+it leverages was patched several years ago. No new updates will be provided.
+The current codebase will remain here for reference purposes.
+
+
 =============================
 Loki
 by Dan Rosenberg (@djrbliss)
